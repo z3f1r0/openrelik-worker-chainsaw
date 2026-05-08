@@ -1,5 +1,5 @@
 # Showcase this worker on https://openrelik.org/marketplace
-publish: false
+publish: true
 
 # Worker Metadata. This section is required.
 display_name: Chainsaw Hunt
