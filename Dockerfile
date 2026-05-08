@@ -1,0 +1,60 @@
+# Use the official Docker Hub Ubuntu base image
+FROM ubuntu:24.04
+
+# Prevent needing to configure debian packages, stopping the setup of
+# the docker container.
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Configure debugging
+ARG OPENRELIK_PYDEBUG
+ENV OPENRELIK_PYDEBUG=${OPENRELIK_PYDEBUG:-0}
+ARG OPENRELIK_PYDEBUG_PORT
+ENV OPENRELIK_PYDEBUG_PORT=${OPENRELIK_PYDEBUG_PORT:-5678}
+
+# Set working directory
+WORKDIR /openrelik
+
+# Install the latest uv binaries
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+# Copy poetry toml and install dependencies
+COPY uv.lock pyproject.toml .
+
+# Install the project's dependencies using the lockfile and settings
+RUN uv sync --locked --no-install-project --no-dev
+
+# Copy project files
+COPY . ./
+
+# Installing separately from its dependencies allows optimal layer caching
+RUN uv sync --locked --no-dev
+
+# Install the worker and set environment to use the correct python interpreter.
+ENV PATH="/openrelik/.venv/bin:$PATH"
+
+# ----------------------------------------------------------------------
+# Install Chainsaw (latest release)
+# ----------------------------------------------------------------------
+RUN CHAINSAW_VERSION=$(curl -s https://api.github.com/repos/WithSecureLabs/chainsaw/releases/latest \
+        | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/') && \
+    curl -L -o /tmp/chainsaw.zip \
+        "https://github.com/WithSecureLabs/chainsaw/releases/download/v${CHAINSAW_VERSION}/chainsaw_all_platforms+rules.zip" && \
+    unzip /tmp/chainsaw.zip -d /tmp/chainsaw_extracted && \
+    rm /tmp/chainsaw.zip && \
+    mkdir -p /chainsaw && \
+    mv /tmp/chainsaw_extracted/chainsaw/chainsaw_x86_64-unknown-linux-gnu /chainsaw/chainsaw && \
+    mv /tmp/chainsaw_extracted/chainsaw/rules /chainsaw/rules && \
+    mv /tmp/chainsaw_extracted/chainsaw/sigma /chainsaw/sigma && \
+    mv /tmp/chainsaw_extracted/chainsaw/mappings /chainsaw/mappings && \
+    chmod +x /chainsaw/chainsaw && \
+    rm -rf /tmp/chainsaw_extracted
+# ----------------------------------------------------------------------
+
+# Default command if not run from docker-compose (and command being overidden)
+CMD ["celery", "--app=src.tasks", "worker", "--task-events", "--concurrency=1", "--loglevel=DEBUG"]

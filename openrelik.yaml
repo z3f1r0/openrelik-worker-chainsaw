@@ -1,0 +1,12 @@
+# Showcase this worker on https://openrelik.org/marketplace
+publish: false
+
+# Worker Metadata. This section is required.
+display_name: Chainsaw Hunt
+description: Hunt through Windows event logs (EVTX) using Chainsaw detection rules and Sigma rules, producing CSV output per detection category.
+
+# Optional: Third-Party Tools Used by the Worker.
+tools:
+  - display_name: Chainsaw
+    description: Rapidly search and hunt through Windows event logs using detection rules and Sigma rules.
+    url: https://github.com/WithSecureLabs/chainsaw

@@ -1,0 +1,24 @@
+[project]
+authors = [
+    {name = "z3f1r0", email = "z3f1r0@protonmail.com"},
+]
+requires-python = "<4.0,>=3.11"
+dependencies = [
+    "celery[redis]<6.0.0,>=5.4.0",
+    "openrelik-common>=0.7.5",
+    "openrelik-worker-common>=0.17.0",
+]
+name = "openrelik-worker-chainsaw"
+version = "0.1.0"
+description = "OpenRelik worker for Chainsaw — hunt through Windows event logs using detection and Sigma rules"
+readme = "README.md"
+
+[dependency-groups]
+test = [
+    "pytest",
+    "pytest-cov<6.0.0,>=5.0.0",
+    "pytest-mock<4.0.0,>=3.14.0",
+]
+
+[tool.uv]
+default-groups = []
