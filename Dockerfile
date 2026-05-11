@@ -39,11 +39,10 @@ RUN uv sync --locked --no-dev
 ENV PATH="/openrelik/.venv/bin:$PATH"
 
 # ----------------------------------------------------------------------
-# Install Chainsaw (latest release)
+# Install Chainsaw
 # ----------------------------------------------------------------------
-RUN CHAINSAW_VERSION=$(curl -s https://api.github.com/repos/WithSecureLabs/chainsaw/releases/latest \
-        | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/') && \
-    curl -L -o /tmp/chainsaw.zip \
+ARG CHAINSAW_VERSION=2.16.0
+RUN curl -L -o /tmp/chainsaw.zip \
         "https://github.com/WithSecureLabs/chainsaw/releases/download/v${CHAINSAW_VERSION}/chainsaw_all_platforms+rules.zip" && \
     unzip /tmp/chainsaw.zip -d /tmp/chainsaw_extracted && \
     rm /tmp/chainsaw.zip && \
