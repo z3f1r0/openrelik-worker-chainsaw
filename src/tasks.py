@@ -128,7 +128,6 @@ def hunt(
             "--mapping", CHAINSAW_MAPPING,
             "--csv",
             "--output", chainsaw_output_dir,
-            "--full",
             "--skip-errors",
         ]
 
