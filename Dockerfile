@@ -41,7 +41,7 @@ ENV PATH="/openrelik/.venv/bin:$PATH"
 # ----------------------------------------------------------------------
 # Install Chainsaw
 # ----------------------------------------------------------------------
-ARG CHAINSAW_VERSION=2.16.0
+ARG CHAINSAW_VERSION=2.16.2
 RUN curl -L -o /tmp/chainsaw.zip \
         "https://github.com/WithSecureLabs/chainsaw/releases/download/v${CHAINSAW_VERSION}/chainsaw_all_platforms+rules.zip" && \
     unzip /tmp/chainsaw.zip -d /tmp/chainsaw_extracted && \
